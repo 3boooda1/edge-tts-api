@@ -1,4 +1,4 @@
-from flask import Flask, request, send_file, Response
+from flask import Flask, request, send_file
 import edge_tts
 import asyncio
 import tempfile
@@ -10,10 +10,15 @@ app = Flask(__name__)
 def home():
     return 'Edge TTS API is running!'
 
-@app.route('/tts', methods=['GET'])
+@app.route('/tts', methods=['GET', 'POST'])
 def tts():
-    text = request.args.get('text', '')
-    voice = request.args.get('voice', 'ar-EG-ShakirNeural')
+    if request.method == 'POST':
+        data = request.get_json()
+        text = data.get('text', '')
+        voice = data.get('voice', 'ar-EG-ShakirNeural')
+    else:
+        text = request.args.get('text', '')
+        voice = request.args.get('voice', 'ar-EG-ShakirNeural')
     
     if not text:
         return {'error': 'No text provided'}, 400
